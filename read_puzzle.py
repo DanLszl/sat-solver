@@ -15,7 +15,7 @@ class Variable:
             self.name = variable
 
     def __repr__(self):
-        return '-' + self.name if self.ispositive else self.name
+        return '-' + self.name if not self.ispositive else self.name
 
 
 def read_puzzles(puzzle_file):
@@ -50,11 +50,18 @@ def parse_dimacs(dimacs_generator):
 
 def solve(puzzle_file, rules_file):
     rules = parse_dimacs(read_dimacs(rules_file))
-    print(rules)
+    # pprint(rules)
     for puzzle in read_puzzles(puzzle_file):
         parsed_puzzle = parse_dimacs(encode_puzzle(puzzle))
-        # solve_puzzle(rules + parsed_puzzle)
+        pprint(parsed_puzzle)
         break
 
+if __name__ == "__main__":
+    solve(puzzle_file, rules_file)
 
-solve(puzzle_file, rules_file)
+
+
+
+
+
+
