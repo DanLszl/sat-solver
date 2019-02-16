@@ -1,15 +1,16 @@
 from collections import defaultdict
-from read_puzzle import parse_dimacs, read_dimacs, rules_file
+from read_puzzle import parse_dimacs, read_dimacs, rules_file, Variable
 from copy import deepcopy
+from pprint import pprint
 
 
-def get_variables_from_rules(rules):
-    variables = defaultdict(bool)
+def initialise_assignments_from_rules(rules):
+    assignments = defaultdict(bool)
     for clause in rules:
         for variable in clause:
-            variables[variable.name] = None
+            assignments[variable.name] = None
 
-    return variables
+    return assignments
 
 
 def istautology(clause):
@@ -28,13 +29,14 @@ def isunitclause(clause):
 
 
 def simplify(problem, assignments):
-    new_problem = []
+    simplified_problem = []
     literals = defaultdict(lambda: {True: 0, False: 0})
     for clause in problem:
         for variable in clause:
             literals[variable.name][variable.ispositive] += 1
 
         if istautology(clause):
+            # TODO: Remove entire clause
             pass
         elif isunitclause(clause):
             variable = clause[0]
@@ -44,13 +46,7 @@ def simplify(problem, assignments):
     pos_pure_literals = [l for l, count in literals.items() if count[False] == 0]
     neg_pure_literals = [l for l, count in literals.items() if count[True] == 0]
 
-
-
-
-
-    return problem
-
-    return problem
+    return simplified_problem
 
 
 def satisfied(problem, assignments):
@@ -72,11 +68,32 @@ def inconsistent(problem, assignment):
         # Check for empty clause
         if not clause:
             return True
-        else:
-            return False
+    return False
 
-rules = parse_dimacs(read_dimacs(rules_file))
-# print(rules[:100])
-variables = get_variables_from_rules(rules)
-print(variables)
-print(len(variables))
+
+if __name__ == '__main__':
+    
+    #rules = parse_dimacs(read_dimacs(rules_file))
+    #variables = get_variables_from_rules(rules)
+
+    assignments = {"P": False, "Q": False, "R": True}
+    problem = [[Variable("P"), Variable("-Q")],
+                [Variable("Q"), Variable("R")],
+                [Variable("-R"), Variable("-P")]]
+
+    print(satisfied(problem, assignments))
+    
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
