@@ -1,21 +1,8 @@
 from pprint import pprint
-from collections import namedtuple
+from variable import Variable
 
 puzzle_file = "1000 sudokus"
 rules_file = "sudoku-rules"
-
-
-class Variable:
-    def __init__(self, variable):
-        if variable[0] == '-':
-            self.ispositive = False
-            self.name = variable[1:]
-        else:
-            self.ispositive = True
-            self.name = variable
-
-    def __repr__(self):
-        return '-' + self.name if not self.ispositive else self.name
 
 
 def read_puzzles(puzzle_file):
@@ -56,12 +43,6 @@ def solve(puzzle_file, rules_file):
         pprint(parsed_puzzle)
         break
 
+
 if __name__ == "__main__":
     solve(puzzle_file, rules_file)
-
-
-
-
-
-
-

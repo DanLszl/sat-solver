@@ -1,11 +1,22 @@
-from collections import defaultdict
-from collections import deque
-from read_puzzle import *
-from pprint import pprint
+from copy import deepcopy
+
+from read_puzzle import (
+    read_dimacs,
+    parse_dimacs,
+    read_puzzles,
+    encode_puzzle,
+    rules_file,
+    puzzle_file,
+)
+
+from variable import Assignments
+from simplification import simplify
+
+from print_sudoku import print_sudoku
 
 
 def initialise_assignments_from_rules(rules):
-    assignments = defaultdict(bool)
+    assignments = Assignments()
     for clause in rules:
         for variable in clause:
             assignments[variable.name] = None
@@ -13,68 +24,44 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def istautology(clause):
-    variables = {}
-    for variable in clause:
-        if variable.name in variables:
-            if variable.ispositive != variables[variable.name]:
-                return True
+def solve_sub_problem(problem, assignments, depth=0):
+    problem = deepcopy(problem)
+    assignments = deepcopy(assignments)
+    problem, assignments = simplify(problem, assignments, verbose=4)
+
+    if all_assigned(assignments):
+        if satisfied(problem, assignments):
+            return True, assignments
         else:
-            variables[variable.name] = variable.ispositive
-    return False
-
-
-def isunitclause(clause):
-    if len(clause) == 1:
-        return True
-
-
-def trueclause(clause, assignments):
-    for variable in clause:
-        if assignments[variable.name] == variable.ispositive:
-            return True
-    return False
-
-
-def simplify(problem, assignments):
-    simples_idx = []
-    literals = defaultdict(lambda: {True: 0, False: 0, "literal_clauses": []})
-
-    for clause_idx, clause in enumerate(problem):
-        for variable in clause:
-            literals[variable.name][variable.ispositive] += 1
-            literals[variable.name]["literal_clauses"].append(clause_idx)
-
-        if istautology(clause):
-            simples_idx.append(clause_idx)
-
-        if isunitclause(clause):
-            simples_idx.append(clause_idx)
-            assignments[clause[0].name] = clause[0].ispositive
-
-        if trueclause(clause, assignments):
-            simples_idx.append(clause_idx)
-
-    for literal, count in literals.items():
-        if count[False] == 0 and assignments[literal] == None:
-            assignments[literal] = True
-            simples_idx += count["literal_clauses"]
-        if count[True] == 0 and assignments[literal] == None:
-            assignments[literal] = False
-            simples_idx += count["literal_clauses"]
-
-    simples_idx = list(dict.fromkeys(simples_idx)) # remove duplicates
-    if len(simples_idx) > 0:
-        for i in sorted(simples_idx, reverse=True): 
-            del problem[i]
-        return simplify(problem, assignments)
+            return False, None
+    if not still_satisfiable(problem, assignments):
+        return False, None
     else:
-        return problem, assignments
+        print_sudoku(assignments.get_true_vars())
+        # print(depth)
+        # print(assignments.get_assigned())
+
+        variable_name = assignments.pick_variable()
+        assignments[variable_name] = True
+
+        result = solve_sub_problem(problem, assignments, depth + 1)
+
+        if result[0]:
+            return result
+
+        assignments[variable_name] = None
+        assignments[variable_name] = False
+        result = solve_sub_problem(problem, assignments, depth + 1)
+
+        if result[0]:
+            return result
+        else:
+            return False, None
 
 
 def all_assigned(assignments):
     for variable, value in assignments.items():
-        if not value:
+        if value is None:
             return False
     return True
 
@@ -85,7 +72,7 @@ def satisfied(problem, assignments):
         for variable in clause:
             i = assignments[variable.name]
             j = variable.ispositive
-            if (not (i ^ j)):
+            if not (i ^ j):
                 flag = True
                 break
         if not flag:
@@ -93,17 +80,17 @@ def satisfied(problem, assignments):
     return True
 
 
-def has_none_assigned(clause, assignment):
+def evaluable(clause, assignment):
     for variable in clause:
-        if assignment[variable.name] == None:
-            return True
-    return False
+        if assignment[variable.name] is None:
+            return False
+    return True
 
 
-def current_true_clauses(problem, assignment):
+def still_satisfiable(problem, assignment):
     for clause in problem:
         flag = False
-        if not has_none_assigned(clause, assignment):
+        if evaluable(clause, assignment):
             for variable in clause:
                 if variable.ispositive == assignment[variable.name]:
                     flag = True
@@ -118,28 +105,60 @@ def test_on_puzzle():
     assignments = initialise_assignments_from_rules(rules)
 
     for puzzle in read_puzzles(puzzle_file):
+
         parsed_puzzle = parse_dimacs(encode_puzzle(puzzle))
+
+        print("Puzzle:")
+        print(parsed_puzzle)
+        print_sudoku([v[0].name for v in parsed_puzzle])
+
         problem = rules + parsed_puzzle
-        problem, assignments = simplify(problem, assignments)
+        # problem, assignments = simplify(problem, assignments)
+        satisfiable, solution = solve_sub_problem(problem, assignments)
+
+        if satisfiable:
+            print_sudoku(solution.get_true_vars())
+        else:
+            print("The problem is not satisfiable")
+
         break
 
-        
-if __name__ == '__main__':
-    assignments = {"P": None, "Q": True, "R": False}
-    problem = [[Variable("P"), Variable("-Q")],
-                [Variable("Q"), Variable("R")],
-                [Variable("-R"), Variable("-P")]]
 
-    # assignments = {"A": None, "B": None, "C": None, "E": None, "F": None, "I": True}
+if __name__ == "__main__":
+    test_on_puzzle()
+
+    # assignments = {"P": None, "Q": None, "R": None}
+    # problem = [[Variable("P"), Variable("-Q")],
+    #             [Variable("Q"), Variable("R")],
+    #             [Variable("-R"), Variable("-P")]]
+
+    # assignments = Assignments(**{"A": None, "B": None, "C": None, "E": None, "F": None, "I": None})
     # problem = [[Variable("-A"), Variable("B"), Variable("E")],
     #           [Variable("-E"), Variable("A")],
     #           [Variable("-E"), Variable("B")],
     #           [Variable("-C"), Variable("F")],
     #           [Variable("-F"), Variable("C")],
     #           [Variable("I")]]
-    
-    print(current_true_clauses(problem, assignments))
 
-    #test_on_puzzle()
-    
-    
+    # assignments = Assignments(**{"A": None, "B": None, "C": None, "E": None, "F": None, "I": None})
+    # problem = [
+    #             [Variable("-A"), Variable("B"), Variable("C")],
+    #             [Variable('B')],
+    #             [Variable('C')]
+    #           ]
+
+    # print(simplify(problem, assignments))
+
+    # test_on_puzzle()
+
+    # assignments = Assignments(**{"P": None, "Q": None, "R": None})
+    # problem = [[Variable("P"), Variable("-Q")],
+    #             [Variable("Q"), Variable("R")],
+    #             [Variable("-R"), Variable("-P")]]
+    # result = solve_sub_problem(problem, assignments)
+    # print(result)
+
+    # clause = [Variable("P"), Variable("-Q"), Variable("-R")]
+    # assignments = Assignments(**{'P': False, 'Q': None, 'R': True})
+    # print(isunitclause(clause, assignments))
+    # print(assignments)
