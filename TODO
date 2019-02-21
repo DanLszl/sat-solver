@@ -1,0 +1,24 @@
+DO
+----------------------------------------
+
+Other Metrics?
+    avg Number of simplifications / per backtracks
+
+Experiments
+    Set up
+    Running
+
+Report
+
+One more heuristic?
+
+
+
+DONE
+----------------------------------------
+MOM
+Jeroslow
+Metrics
+    Number of backtracks
+    Number of flips 
+    Number of times we pick variables

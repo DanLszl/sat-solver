@@ -1,5 +1,6 @@
 from collections import defaultdict, Counter
 import numbers
+import random
 
 
 class Variable:
@@ -97,12 +98,23 @@ class Assignments:
     def is_assigned(self, var_name):
         return self.assignments[var_name] is not None
 
-    def pick_variable(self):
+    def pick_deterministic(self):
         for k, v in self.assignments.items():
             if v is None:
                 return k
-        # unassigned = self.get_unassigned()
-        # return random.choice(unassigned)
+
+    def pick_random(self):
+        unassigned = self.get_unassigned()
+        return random.choice(unassigned)
+    
+    def pick_variable(self, problem, heuristic=None):
+        if heuristic is None:
+            return self.pick_random()
+        elif heuristic == "MOM":
+            return self.pick_variable_MOM(problem)
+        elif heuristic == "Jeroslow":
+            return self.pick_variable_Jeroslow(problem)
+        
 
     def pick_variable_MOM(self, problem, k=2):
         pos_counter = MOMCounter(
@@ -116,7 +128,7 @@ class Assignments:
             if not v.ispositive and not self.is_assigned(v.name)
         )
 
-        S = (pos_counter + neg_counter) * 2 ** k  # + pos_counter * neg_counter
+        S = (pos_counter + neg_counter) * 2 ** k + pos_counter * neg_counter
 
         return S.most_common(1)[0][0]
 

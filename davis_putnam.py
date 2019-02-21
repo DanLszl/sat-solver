@@ -13,6 +13,8 @@ from variable import Assignments
 from simplification import simplify
 
 from print_sudoku import print_sudoku
+from metrics import Metrics
+import random
 
 
 def initialise_assignments_from_rules(rules):
@@ -24,7 +26,7 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, depth=0, heuristic=None):
+def solve_sub_problem(problem, assignments, metrics, depth=0, heuristic=None):
     problem = deepcopy(problem)
     assignments = deepcopy(assignments)
     problem, assignments = simplify(problem, assignments, verbose=4)
@@ -33,34 +35,37 @@ def solve_sub_problem(problem, assignments, depth=0, heuristic=None):
         if satisfied(problem, assignments):
             return True, assignments
         else:
+            metrics.backtrack()
             return False, None
+
     if not still_satisfiable(problem, assignments):
+        metrics.backtrack()
         return False, None
     else:
         print_sudoku(assignments.get_true_vars())
         # print(depth)
-        # print(assignments.get_assigned())
-        if heuristic is None:
-            variable_name = assignments.pick_variable()
-        elif heuristic == "MOM":
-            variable_name = assignments.pick_variable_MOM(problem)
-        elif heuristic == "Jeroslow":
-            variable_name = assignments.pick_variable_Jeroslow(problem)
+        
+        variable_name = assignments.pick_variable(problem, heuristic)
 
-        assignments[variable_name] = True
+        assignments[variable_name] = random.choice([True, False])
+        metrics.pick_var()
 
-        result = solve_sub_problem(problem, assignments, depth + 1)
+        result = solve_sub_problem(problem, assignments, metrics, depth + 1)
 
         if result[0]:
             return result
 
+        opposite = not assignments[variable_name]
         assignments[variable_name] = None
-        assignments[variable_name] = False
-        result = solve_sub_problem(problem, assignments, depth + 1)
+        assignments[variable_name] = opposite
+        metrics.flip()
+
+        result = solve_sub_problem(problem, assignments, metrics, depth + 1)
 
         if result[0]:
             return result
         else:
+            metrics.backtrack()
             return False, None
 
 
@@ -109,6 +114,8 @@ def test_on_puzzle():
     rules = parse_dimacs(read_dimacs(rules_file))
     assignments = initialise_assignments_from_rules(rules)
 
+    problems_metrics = []
+
     for puzzle in read_puzzles(puzzle_file):
 
         parsed_puzzle = parse_dimacs(encode_puzzle(puzzle))
@@ -118,12 +125,22 @@ def test_on_puzzle():
         print_sudoku([v[0].name for v in parsed_puzzle])
 
         problem = rules + parsed_puzzle
-        # problem, assignments = simplify(problem, assignments)
-        # satisfiable, solution = solve_sub_problem(problem, assignments)
-        # satisfiable, solution = solve_sub_problem(problem, assignments, heuristic="MOM")
-        satisfiable, solution = solve_sub_problem(
-            problem, assignments, heuristic="Jeroslow"
-        )
+
+        metrics1 = Metrics()
+        satisfiable, solution = solve_sub_problem(problem, assignments, metrics1)
+        
+
+        metrics = Metrics()
+        satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic="MOM")
+        
+        print(metrics1)
+        print(metrics)
+        
+        # metrics = Metrics()        
+        # satisfiable, solution = solve_sub_problem(
+        #     problem, assignments, metrics, heuristic="Jeroslow"
+        # )
+        # print(metrics)
 
         if satisfiable:
             print_sudoku(solution.get_true_vars())
