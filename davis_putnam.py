@@ -24,7 +24,7 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, depth=0):
+def solve_sub_problem(problem, assignments, depth=0, heuristic=None):
     problem = deepcopy(problem)
     assignments = deepcopy(assignments)
     problem, assignments = simplify(problem, assignments, verbose=4)
@@ -40,8 +40,14 @@ def solve_sub_problem(problem, assignments, depth=0):
         print_sudoku(assignments.get_true_vars())
         # print(depth)
         # print(assignments.get_assigned())
+        if heuristic is None:
+            variable_name = assignments.pick_variable()
+        elif heuristic == "MOM":
+            variable_name = assignments.pick_variable_MOM(problem)
+            pass
+        elif heuristic == "BOHM":
+            pass
 
-        variable_name = assignments.pick_variable()
         assignments[variable_name] = True
 
         result = solve_sub_problem(problem, assignments, depth + 1)
@@ -115,6 +121,7 @@ def test_on_puzzle():
         problem = rules + parsed_puzzle
         # problem, assignments = simplify(problem, assignments)
         satisfiable, solution = solve_sub_problem(problem, assignments)
+        # satisfiable, solution = solve_sub_problem(problem, assignments, heuristic="MOM")
 
         if satisfiable:
             print_sudoku(solution.get_true_vars())

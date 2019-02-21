@@ -1,4 +1,5 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
+import numbers
 
 
 class Variable:
@@ -16,6 +17,25 @@ class Variable:
 
     def __repr__(self):
         return "-" + self.name if not self.ispositive else self.name
+
+
+def variables_of_problem(problem):
+    for clause in problem:
+        for variable in clause:
+            yield variable
+
+
+class MOMCounter(Counter):
+    def __add__(self, other):
+        return MOMCounter({k: self[k] + other[k] for k in self.keys() | other.keys()})
+
+    def __mul__(self, other):
+        if isinstance(other, numbers.Number):
+            return MOMCounter({k: count * other for k, count in self.items()})
+        else:
+            return MOMCounter(
+                {k: self[k] * other[k] for k in self.keys() | other.keys()}
+            )
 
 
 class Assignments:
@@ -37,7 +57,7 @@ class Assignments:
             self.assignments[key] = value
         else:
             raise ValueError(
-                "Variable {} already assigned".format(self.assignments[key])
+                "Variable {} already assigned".format(key)
             )
 
     def items(self):
@@ -70,9 +90,37 @@ class Assignments:
                 unassigned.append(k)
         return unassigned
 
+    def is_assigned(self, var_name):
+        return self.assignments[var_name] is not None
+
     def pick_variable(self):
         for k, v in self.assignments.items():
             if v is None:
                 return k
         # unassigned = self.get_unassigned()
         # return random.choice(unassigned)
+
+    def pick_variable_MOM(self, problem, k=2):
+        pos_counter = MOMCounter(
+            v.name
+            for v in variables_of_problem(problem)
+            if v.ispositive and not self.is_assigned(v.name)
+        )
+        neg_counter = MOMCounter(
+            v.name
+            for v in variables_of_problem(problem)
+            if not v.ispositive and not self.is_assigned(v.name)
+        )
+
+        S = (pos_counter + neg_counter) * 2 ** k  # + pos_counter * neg_counter
+
+        return S.most_common(1)[0][0]
+
+
+if __name__ == "__main__":
+    a = [1, 2, 3, 3]
+    d = [2, 3, 3, 4]
+    a_c = MOMCounter(a)
+    d_c = MOMCounter(d)
+    print(a_c * 2)
+    print(a_c * d_c)

@@ -1,7 +1,7 @@
 from read_puzzle import Variable
 from collections import defaultdict
 
-from variable import Assignments
+from variable import Assignments, variables_of_problem
 from print_sudoku import print_sudoku
 
 
@@ -50,12 +50,6 @@ def remove_tautologies(problem):
     diff = len(problem) - len(new_problem)
     problem[:] = new_problem
     return diff
-
-
-def variables_of_problem(problem):
-    for clause in problem:
-        for variable in clause:
-            yield variable
 
 
 def get_pure_literals(problem, assignments):
