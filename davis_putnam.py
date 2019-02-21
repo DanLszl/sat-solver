@@ -44,9 +44,8 @@ def solve_sub_problem(problem, assignments, depth=0, heuristic=None):
             variable_name = assignments.pick_variable()
         elif heuristic == "MOM":
             variable_name = assignments.pick_variable_MOM(problem)
-            pass
-        elif heuristic == "BOHM":
-            pass
+        elif heuristic == "Jeroslow":
+            variable_name = assignments.pick_variable_Jeroslow(problem)
 
         assignments[variable_name] = True
 
@@ -120,8 +119,11 @@ def test_on_puzzle():
 
         problem = rules + parsed_puzzle
         # problem, assignments = simplify(problem, assignments)
-        satisfiable, solution = solve_sub_problem(problem, assignments)
+        # satisfiable, solution = solve_sub_problem(problem, assignments)
         # satisfiable, solution = solve_sub_problem(problem, assignments, heuristic="MOM")
+        satisfiable, solution = solve_sub_problem(
+            problem, assignments, heuristic="Jeroslow"
+        )
 
         if satisfiable:
             print_sudoku(solution.get_true_vars())

@@ -25,6 +25,12 @@ def variables_of_problem(problem):
             yield variable
 
 
+def variables_with_clause_length(problem):
+    for clause in problem:
+        for variable in clause:
+            yield variable, len(clause)
+
+
 class MOMCounter(Counter):
     def __add__(self, other):
         return MOMCounter({k: self[k] + other[k] for k in self.keys() | other.keys()})
@@ -56,9 +62,7 @@ class Assignments:
         elif value is None:
             self.assignments[key] = value
         else:
-            raise ValueError(
-                "Variable {} already assigned".format(key)
-            )
+            raise ValueError("Variable {} already assigned".format(key))
 
     def items(self):
         return self.assignments.items()
@@ -115,6 +119,15 @@ class Assignments:
         S = (pos_counter + neg_counter) * 2 ** k  # + pos_counter * neg_counter
 
         return S.most_common(1)[0][0]
+
+    def pick_variable_Jeroslow(self, problem):
+        jeroslow_values = defaultdict(float)
+
+        for var, clause_len in variables_with_clause_length(problem):
+            if not self.is_assigned(var.name):
+                jeroslow_values[var.name] += 2 ** (-clause_len)
+
+        return max(jeroslow_values, key=jeroslow_values.get)
 
 
 if __name__ == "__main__":
