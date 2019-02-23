@@ -7,11 +7,13 @@ Other Metrics?
 Experiments
     Set up
     Running
+    iteratively remove elements
+    
+One more heuristic
+    Literal count heuristic
+    setting p(TRUE)=81/729, p(FALSE) = 1 - (81/729)
 
 Report
-
-One more heuristic?
-
 
 
 DONE
