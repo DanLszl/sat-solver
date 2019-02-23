@@ -111,8 +111,7 @@ def still_satisfiable(problem, assignment):
 
 
 if __name__ == "__main__":
-    test_on_puzzle()
-
+    print("Hello")
     # assignments = {"P": None, "Q": None, "R": None}
     # problem = [[Variable("P"), Variable("-Q")],
     #             [Variable("Q"), Variable("R")],

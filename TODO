@@ -7,7 +7,19 @@ Other Metrics?
 Experiments
     Set up
     Running
-    iteratively remove elements
+
+    ------iteratively remove elements----
+    for difficulty in filenames:
+        for heuristic in heuristics:
+            for sub_puzzle in puzzle:
+                Metrics[difficulty, heuristic, size_of_sub_puzzle] = solve(heuristic, sub_puzzle)
+
+    -------------------------------------
+    Plot Metrics for different heuristics
+    Plot Metrics for different sizes
+
+
+
     
 One more heuristic
     Literal count heuristic
