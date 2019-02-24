@@ -164,7 +164,11 @@ class Assignments:
 
         S = (pos_counter + neg_counter) * 2 ** k + pos_counter * neg_counter
 
-        return S.most_common(1)[0][0]
+        most_common = S.most_common()
+        for idx, ((i_name, i_value), (j_name, j_value)) in enumerate(zip(most_common[:-1], most_common[1:])):
+            if i_value != j_value:
+                return random.choice(most_common[:idx+1])[0]
+        return random.choice(most_common)[0]
 
     def pick_variable_Jeroslow(self, problem):
         jeroslow_values = defaultdict(float)
