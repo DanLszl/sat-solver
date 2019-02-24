@@ -8,8 +8,11 @@ from read_puzzle import (
 
 from metrics import Metrics
 from print_sudoku import print_sudoku
+from time import time
+
 
 puzzle_file = "1000 sudokus"
+# puzzle_file = "damnhard.sdk"
 rules_file = "sudoku-rules"
 
 
@@ -26,28 +29,28 @@ def test_on_puzzle():
         print_sudoku([v[0].name for v in parsed_puzzle])
 
         problem = rules + parsed_puzzle
-
-        metrics1 = Metrics()
-        satisfiable, solution = solve_sub_problem(problem, assignments, metrics1)
         
-        metrics = Metrics()
-        satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic="MOM")
-        
-        print(metrics1)
-        print(metrics)
-        
-        # metrics = Metrics()        
-        # satisfiable, solution = solve_sub_problem(
-        #     problem, assignments, metrics, heuristic="Jeroslow"
-        # )
-        # print(metrics)
+        heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+        biased = [True, False]
+        # heuristics = ["MOM"]
+        # biased = [True]
 
-        if satisfiable:
-            print_sudoku(solution.get_true_vars())
-        else:
-            print("The problem is not satisfiable")
+        for h in heuristics:
+            for b in biased:
+                start_time = time()
+                print(h, b)
+                metrics = Metrics()
+                satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic=h, biased_coin=b)
+                print(metrics)
+                print("Time:", time() - start_time)
+                print()
 
+                if satisfiable:
+                    print_sudoku(solution.get_true_vars())
+                else:
+                    print("The problem is not satisfiable")
         break
+
 
 if __name__ == "__main__":
     test_on_puzzle()

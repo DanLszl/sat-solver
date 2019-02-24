@@ -13,8 +13,6 @@ from variable import Assignments
 from simplification import simplify
 
 from print_sudoku import print_sudoku
-from metrics import Metrics
-import random
 
 
 def initialise_assignments_from_rules(rules):
@@ -26,10 +24,10 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, metrics, depth=0, heuristic=None):
+def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False):
     problem = deepcopy(problem)
     assignments = deepcopy(assignments)
-    problem, assignments = simplify(problem, assignments, verbose=4)
+    problem, assignments = simplify(problem, assignments, metrics, verbose=4)
 
     if all_assigned(assignments):
         if satisfied(problem, assignments):
@@ -45,12 +43,12 @@ def solve_sub_problem(problem, assignments, metrics, depth=0, heuristic=None):
         print_sudoku(assignments.get_true_vars())
         # print(depth)
         
-        variable_name = assignments.pick_variable(problem, heuristic)
+        variable_name, first_assignment = assignments.pick_variable(problem, heuristic, biased_coin=biased_coin)
 
-        assignments[variable_name] = random.choice([True, False])
+        assignments[variable_name] = first_assignment
         metrics.pick_var()
 
-        result = solve_sub_problem(problem, assignments, metrics, depth + 1)
+        result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin)
 
         if result[0]:
             return result
@@ -60,7 +58,7 @@ def solve_sub_problem(problem, assignments, metrics, depth=0, heuristic=None):
         assignments[variable_name] = opposite
         metrics.flip()
 
-        result = solve_sub_problem(problem, assignments, metrics, depth + 1)
+        result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin)
 
         if result[0]:
             return result

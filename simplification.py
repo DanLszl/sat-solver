@@ -92,7 +92,7 @@ def assign_unit_clauses(problem, assignments):
     return diff
 
 
-def simplify(problem, assignments, depth=0, verbose=0):
+def simplify(problem, assignments, metrics, depth=0, verbose=0):
     """
     Modifies the problem and the assignments by
     1. Removing all tautologies
@@ -124,7 +124,8 @@ def simplify(problem, assignments, depth=0, verbose=0):
     if modifications == 0:
         return problem, assignments
     else:
-        return simplify(problem, assignments, depth + 1)
+        metrics.simplify(modifications)
+        return simplify(problem, assignments, metrics, depth + 1)
 
 
 if __name__ == "__main__":

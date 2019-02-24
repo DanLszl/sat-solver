@@ -3,6 +3,10 @@ class Metrics:
         self.number_of_backtracks = 0
         self.number_of_flips = 0
         self.number_of_var_picks = 0
+        self.simplifications = 0
+
+    def simplify(self, modifications):
+        self.simplifications += modifications
 
     def backtrack(self):
         self.number_of_backtracks += 1
@@ -24,5 +28,7 @@ class Metrics:
             + "number_of_var_picks:"
             + str(self.number_of_var_picks)
             + "\n"
+            + "simplifications:"
+            + str(self.simplifications)
         )
 

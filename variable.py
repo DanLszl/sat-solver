@@ -107,16 +107,46 @@ class Assignments:
         unassigned = self.get_unassigned()
         return random.choice(unassigned)
     
-    def pick_variable(self, problem, heuristic=None):
+    def pick_value(self, biased_coin):
+        if not biased_coin:
+            weights = [0.5, 0.5]
+        else:
+            weights = [1-81/729, 81/729]
+        
+        return random.choices([True, False], weights=weights, k=1)[0]
+
+
+
+    def pick_variable(self, problem, heuristic=None, biased_coin=False):
         if heuristic is None:
-            return self.pick_random()
+            return self.pick_random(), self.pick_value(biased_coin)
         elif heuristic == "MOM":
-            return self.pick_variable_MOM(problem)
+            return self.pick_variable_MOM(problem), self.pick_value(biased_coin)
         elif heuristic == "Jeroslow":
-            return self.pick_variable_Jeroslow(problem)
+            return self.pick_variable_Jeroslow(problem), self.pick_value(biased_coin)
+        elif heuristic == "literalcount":
+            pos_counter, neg_counter = self.count_pos_neg(problem)
+            variable_name = self.pick_variable_literal_count(problem, pos_counter, neg_counter)
+            value = self.pick_value_literalcount(self, pos_counter[variable_name], neg_counter[variable_name], biased_coin)
+            return variable_name, value
         
 
-    def pick_variable_MOM(self, problem, k=2):
+    def pick_value_literalcount(self, variable_name, p_count, n_count, biased_coin):
+        sum_count = p_count + n_count
+        if not biased_coin:
+            return p_count >= n_count
+        else:
+            weights = [p_count/sum_count, n_count/sum_count]
+            return random.choices([True, False], weights=weights, k=1)[0]
+
+
+    def pick_variable_literal_count(self, problem, pos_counter, neg_counter):
+        # pos_counter, neg_counter = self.count_pos_neg(problem)
+        sum_counter = pos_counter + neg_counter
+        variable_name = sum_counter.most_common(1)[0][0]
+        return variable_name
+    
+    def count_pos_neg(self, problem):
         pos_counter = MOMCounter(
             v.name
             for v in variables_of_problem(problem)
@@ -127,6 +157,10 @@ class Assignments:
             for v in variables_of_problem(problem)
             if not v.ispositive and not self.is_assigned(v.name)
         )
+        return pos_counter, neg_counter
+
+    def pick_variable_MOM(self, problem, k=2):
+        pos_counter, neg_counter = self.count_pos_neg(problem)
 
         S = (pos_counter + neg_counter) * 2 ** k + pos_counter * neg_counter
 
