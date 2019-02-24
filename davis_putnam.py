@@ -1,14 +1,5 @@
 from copy import deepcopy
 
-from read_puzzle import (
-    read_dimacs,
-    parse_dimacs,
-    read_puzzles,
-    encode_puzzle,
-    rules_file,
-    puzzle_file,
-)
-
 from variable import Assignments
 from simplification import simplify
 
@@ -24,10 +15,10 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False):
+def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False, verbose=0):
     problem = deepcopy(problem)
     assignments = deepcopy(assignments)
-    problem, assignments = simplify(problem, assignments, metrics, verbose=4)
+    problem, assignments = simplify(problem, assignments, metrics, verbose=verbose)
 
     if all_assigned(assignments):
         if satisfied(problem, assignments):
@@ -40,9 +31,9 @@ def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_
         metrics.backtrack()
         return False, None
     else:
-        print_sudoku(assignments.get_true_vars())
-        # print(depth)
-        
+        if verbose > 0:
+            print_sudoku(assignments.get_true_vars())
+
         variable_name, first_assignment = assignments.pick_variable(problem, heuristic, biased_coin=biased_coin)
 
         assignments[variable_name] = first_assignment
