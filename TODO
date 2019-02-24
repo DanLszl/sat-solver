@@ -1,17 +1,20 @@
-
-☐ Experiments
-    ☐ Set up
+☐ hypotheses/Experiments
+  
+  ☐ Is compression size (?) correlated to the hardness of a sudoku
+    ☐ How compression works: removes trivial things
+    ☐ Pick Compression algorithm for sudoku
+  ☐ Set up
+    ☐ Flow
+      ☐ Do this for a lot of sudokus
+        ☐ Solve sudoku
+        ☐ Store metrics
+        ☐ Store solved sudoku
+        ☐ Compress
+        ☐ Calculate compression size (rate of compression?)
+    
+    ☐ Plot
+    ☐ Statistical tests
     ☐ Running
-
-    ☐ ------iteratively remove elements----
-    ☐ for difficulty in filenames:
-        ☐ for heuristic in heuristics:
-            ☐ for sub_puzzle in puzzle:
-                ☐ Metrics[difficulty, heuristic, size_of_sub_puzzle] = solve(heuristic, sub_puzzle)
-
-    ☐ -------------------------------------
-    ☐ Plot Metrics for different heuristics
-    ☐ Plot Metrics for different sizes
 
 ☐ Report
     ☐ 
@@ -28,3 +31,5 @@ Archive:
     ✔ Number of backtracks @done(19-02-24 14:25)
     ✔ Number of flips @done(19-02-24 14:25)
     ✔ Number of times we pick variables @done(19-02-24 14:25)
+  
+  ☐ Is the difficulty related to the given numbers of a sudoku.
