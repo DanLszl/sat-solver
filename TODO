@@ -1,38 +1,30 @@
-DO
-----------------------------------------
 
-Other Metrics?
-    avg Number of simplifications / per backtracks
+☐ Experiments
+    ☐ Set up
+    ☐ Running
 
-Experiments
-    Set up
-    Running
+    ☐ ------iteratively remove elements----
+    ☐ for difficulty in filenames:
+        ☐ for heuristic in heuristics:
+            ☐ for sub_puzzle in puzzle:
+                ☐ Metrics[difficulty, heuristic, size_of_sub_puzzle] = solve(heuristic, sub_puzzle)
 
-    ------iteratively remove elements----
-    for difficulty in filenames:
-        for heuristic in heuristics:
-            for sub_puzzle in puzzle:
-                Metrics[difficulty, heuristic, size_of_sub_puzzle] = solve(heuristic, sub_puzzle)
+    ☐ -------------------------------------
+    ☐ Plot Metrics for different heuristics
+    ☐ Plot Metrics for different sizes
 
-    -------------------------------------
-    Plot Metrics for different heuristics
-    Plot Metrics for different sizes
+☐ Report
+    ☐ 
 
-
-
-    
-One more heuristic
-    Literal count heuristic
-    setting p(TRUE)=81/729, p(FALSE) = 1 - (81/729)
-
-Report
-
-
-DONE
-----------------------------------------
-MOM
-Jeroslow
-Metrics
-    Number of backtracks
-    Number of flips 
-    Number of times we pick variables
+Archive:
+  ✔ Other Metrics? @done(19-02-24 16:44)
+  ✔     avg Number of simplifications / per backtracks @done(19-02-24 16:44)
+  ✔ One more heuristic @done(19-02-24 16:45)
+    ✔ Literal count heuristic @done(19-02-24 16:45)
+    ✔ setting p(TRUE)=81/729, p(FALSE) = 1 - (81/729) @done(19-02-24 16:45)
+  ✔ MOM @done(19-02-24 14:25)
+  ✔ Jeroslow @done(19-02-24 14:25)
+  ✔ Metrics @done(19-02-24 14:25)
+    ✔ Number of backtracks @done(19-02-24 14:25)
+    ✔ Number of flips @done(19-02-24 14:25)
+    ✔ Number of times we pick variables @done(19-02-24 14:25)
