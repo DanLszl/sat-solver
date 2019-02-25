@@ -1,5 +1,6 @@
 class Metrics:
-    def __init__(self):
+    def __init__(self, verbose=False):
+        self.verbose = verbose
         self.number_of_backtracks = 0
         self.number_of_flips = 0
         self.number_of_var_picks = 0
@@ -10,6 +11,8 @@ class Metrics:
 
     def backtrack(self):
         self.number_of_backtracks += 1
+        if self.verbose:
+            print(self.number_of_backtracks)
 
     def flip(self):
         self.number_of_flips += 1
