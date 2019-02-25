@@ -191,12 +191,12 @@ class Assignments:
     def count_pos_neg(self, problem):
         pos_counter = MOMCounter(
             v.name
-            for v in variables_of_problem(problem)
+            for v in problem.variables()
             if v.ispositive and not self.is_assigned(v.name)
         )
         neg_counter = MOMCounter(
             v.name
-            for v in variables_of_problem(problem)
+            for v in problem.variables()
             if not v.ispositive and not self.is_assigned(v.name)
         )
         return pos_counter, neg_counter
