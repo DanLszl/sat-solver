@@ -10,7 +10,6 @@ previous = None
 
 def print_sudoku(true_vars):
     global previous
-    # print(previous)
     if previous is not None:
         color_this = set(true_vars) - set(previous)
     else:

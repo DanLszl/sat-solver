@@ -1,8 +1,7 @@
 from pprint import pprint
 from variable import Variable
 
-puzzle_file = "1000 sudokus"
-rules_file = "sudoku-rules"
+
 
 
 def read_puzzles(puzzle_file):
@@ -45,4 +44,7 @@ def solve(puzzle_file, rules_file):
 
 
 if __name__ == "__main__":
+    puzzle_file = "1000 sudokus"
+    
+    rules_file = "sudoku-rules"
     solve(puzzle_file, rules_file)

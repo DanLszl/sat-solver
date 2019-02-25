@@ -9,10 +9,14 @@ from read_puzzle import (
 from metrics import Metrics
 from print_sudoku import print_sudoku
 from time import time
+import random
+
+from problem import Problem
 
 
-puzzle_file = "1000 sudokus"
-# puzzle_file = "damnhard.sdk"
+# puzzle_file = "1000 sudokus"
+puzzle_file = "damnhard.sdk"
+# puzzle_file = "hard_with_25"
 rules_file = "sudoku-rules"
 
 
@@ -28,19 +32,23 @@ def test_on_puzzle():
         print(parsed_puzzle)
         print_sudoku([v[0].name for v in parsed_puzzle])
 
-        problem = rules + parsed_puzzle
+        problem = Problem(rules + parsed_puzzle)
+
+        # heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+        # biased = [True, False]
+        heuristics = ["Jeroslow"]
+        biased = [True]
         
-        heuristics = [None, "MOM", "literalcount", "Jeroslow"]
-        biased = [True, False]
         # heuristics = ["MOM"]
         # biased = [True]
-
+        random.seed(285834)
         for h in heuristics:
             for b in biased:
                 start_time = time()
                 print(h, b)
-                metrics = Metrics()
-                satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic=h, biased_coin=b)
+                verbose = False
+                metrics = Metrics(verbose=not verbose)
+                satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic=h, biased_coin=b, verbose=verbose)
                 print(metrics)
                 print("Time:", time() - start_time)
                 print()

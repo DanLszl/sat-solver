@@ -3,8 +3,6 @@ from copy import deepcopy
 from variable import Assignments
 from simplification import simplify
 
-from print_sudoku import print_sudoku
-
 
 def initialise_assignments_from_rules(rules):
     assignments = Assignments()
@@ -15,88 +13,48 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False, verbose=0):
+def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False, verbose=False):
     problem = deepcopy(problem)
-    assignments = deepcopy(assignments)
-    problem, assignments = simplify(problem, assignments, metrics, verbose=verbose)
+    # assignments = deepcopy(assignments)
+    with assignments.checkpoint():
+        problem, assignments = simplify(problem, assignments, metrics, verbose=verbose)
 
-    if all_assigned(assignments):
-        if satisfied(problem, assignments):
-            return True, assignments
-        else:
+        if assignments.is_all_assigned():
+            if problem.satisfied(assignments):
+                assignments.set_solved()
+                return True, assignments
+            else:
+                metrics.backtrack()
+                return False, None
+
+        if not problem.still_satisfiable(assignments):
             metrics.backtrack()
             return False, None
-
-    if not still_satisfiable(problem, assignments):
-        metrics.backtrack()
-        return False, None
-    else:
-        if verbose > 0:
-            print_sudoku(assignments.get_true_vars())
-
-        variable_name, first_assignment = assignments.pick_variable(problem, heuristic, biased_coin=biased_coin)
-
-        assignments[variable_name] = first_assignment
-        metrics.pick_var()
-
-        result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin)
-
-        if result[0]:
-            return result
-
-        opposite = not assignments[variable_name]
-        assignments[variable_name] = None
-        assignments[variable_name] = opposite
-        metrics.flip()
-
-        result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin)
-
-        if result[0]:
-            return result
         else:
-            metrics.backtrack()
-            return False, None
+            with assignments.printing(verbose):
 
+                variable_name, first_assignment = assignments.pick_variable(problem, heuristic, biased_coin=biased_coin)
 
-def all_assigned(assignments):
-    for variable, value in assignments.items():
-        if value is None:
-            return False
-    return True
+                assignments[variable_name] = first_assignment
+                metrics.pick_var()
 
+                result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin, verbose=verbose)
 
-def satisfied(problem, assignments):
-    for clause in problem:
-        flag = False
-        for variable in clause:
-            i = assignments[variable.name]
-            j = variable.ispositive
-            if not (i ^ j):
-                flag = True
-                break
-        if not flag:
-            return False
-    return True
+                if result[0]:
+                    return result
 
+                opposite = not assignments[variable_name]
+                assignments[variable_name] = None
+                assignments[variable_name] = opposite
+                metrics.flip()
 
-def evaluable(clause, assignment):
-    for variable in clause:
-        if assignment[variable.name] is None:
-            return False
-    return True
+                result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin, verbose=verbose)
 
-
-def still_satisfiable(problem, assignment):
-    for clause in problem:
-        flag = False
-        if evaluable(clause, assignment):
-            for variable in clause:
-                if variable.ispositive == assignment[variable.name]:
-                    flag = True
-                    break
-            if not flag:
-                return False
-    return True
+                if result[0]:
+                    return result
+                else:
+                    metrics.backtrack()
+                    return False, None
 
 
 if __name__ == "__main__":
