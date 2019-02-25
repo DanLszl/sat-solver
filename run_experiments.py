@@ -6,6 +6,8 @@ from read_puzzle import (
     encode_puzzle
 )
 
+from copy import deepcopy
+
 from metrics import Metrics
 from print_sudoku import print_sudoku
 from time import time
@@ -34,10 +36,10 @@ def test_on_puzzle():
 
         problem = Problem(rules + parsed_puzzle)
 
-        # heuristics = [None, "MOM", "literalcount", "Jeroslow"]
-        # biased = [True, False]
-        heuristics = ["Jeroslow"]
-        biased = [True]
+        heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+        biased = [True, False]
+        # heuristics = ["Jeroslow"]
+        # biased = [True]
         
         # heuristics = ["MOM"]
         # biased = [True]
@@ -48,7 +50,8 @@ def test_on_puzzle():
                 print(h, b)
                 verbose = False
                 metrics = Metrics(verbose=not verbose)
-                satisfiable, solution = solve_sub_problem(problem, assignments, metrics, heuristic=h, biased_coin=b, verbose=verbose)
+                assignments_to_modify = deepcopy(assignments) 
+                satisfiable, solution = solve_sub_problem(problem, assignments_to_modify, metrics, heuristic=h, biased_coin=b, verbose=verbose)
                 print(metrics)
                 print("Time:", time() - start_time)
                 print()

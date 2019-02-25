@@ -25,6 +25,23 @@ def istautology(clause):
 class Problem:
     def __init__(self, problem):
         self.problem = problem
+        self.modification_stack = [[]]
+
+    @contextmanager
+    def checkpoint(self):
+        try:
+            self.create_checkpoint()
+            yield
+        finally:
+            self.restore_checkpoint()
+
+    def create_checkpoint(self):
+        self.modification_stack.append([])
+
+    def restore_checkpoint(self):
+        for clause in self.modification_stack[-1]:
+            self.problem.append(clause)
+        del self.modification_stack[-1]
 
     def satisfied(self, assignments):
         problem = self.problem
@@ -54,7 +71,13 @@ class Problem:
 
     def remove_tautologies(self):
         problem = self.problem
-        new_problem = [clause for clause in problem if not istautology(clause)]
+        new_problem = []
+        for clause in problem:
+            if istautology(clause):
+                self.modification_stack[-1].append(clause)
+            else:
+                new_problem.append(clause)
+        
         diff = len(problem) - len(new_problem)
         problem[:] = new_problem
         return diff
@@ -105,6 +128,7 @@ class Problem:
             if count == 1:
                 # Unit variable, assign, and do not append
                 assignments[last_variable.name] = last_variable.ispositive
+                self.modification_stack[-1].append(clause)
             else:
                 new_problem.append(clause)
 
