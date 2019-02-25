@@ -43,6 +43,13 @@ class MOMCounter(Counter):
             return MOMCounter(
                 {k: self[k] * other[k] for k in self.keys() | other.keys()}
             )
+    
+    def get_most_common(self):
+        most_common = super().most_common()
+        for idx, ((i_name, i_value), (j_name, j_value)) in enumerate(zip(most_common[:-1], most_common[1:])):
+            if i_value != j_value:
+                return random.choice(most_common[:idx+1])[0]
+        return random.choice(most_common)
 
 
 class Assignments:
@@ -141,9 +148,8 @@ class Assignments:
 
 
     def pick_variable_literal_count(self, problem, pos_counter, neg_counter):
-        # pos_counter, neg_counter = self.count_pos_neg(problem)
         sum_counter = pos_counter + neg_counter
-        variable_name = sum_counter.most_common(1)[0][0]
+        variable_name = sum_counter.get_most_common()[0]
         return variable_name
     
     def count_pos_neg(self, problem):
@@ -164,11 +170,7 @@ class Assignments:
 
         S = (pos_counter + neg_counter) * 2 ** k + pos_counter * neg_counter
 
-        most_common = S.most_common()
-        for idx, ((i_name, i_value), (j_name, j_value)) in enumerate(zip(most_common[:-1], most_common[1:])):
-            if i_value != j_value:
-                return random.choice(most_common[:idx+1])[0]
-        return random.choice(most_common)[0]
+        return S.get_most_common()[0]
 
     def pick_variable_Jeroslow(self, problem):
         jeroslow_values = defaultdict(float)
@@ -176,9 +178,21 @@ class Assignments:
         for var, clause_len in variables_with_clause_length(problem):
             if not self.is_assigned(var.name):
                 jeroslow_values[var.name] += 2 ** (-clause_len)
+        
+        maxes = all_max(jeroslow_values, key=jeroslow_values.get)
+        return random.choice(maxes)
 
-        return max(jeroslow_values, key=jeroslow_values.get)
 
+def all_max(iterable, key=lambda x: x):
+    max_value = float('-inf')
+    maxes = []
+    for i in iterable:
+        if key(i) > max_value:
+            max_value = key(i)
+            maxes = [i]
+        elif key(i) == max_value:
+            maxes.append(i)
+    return maxes
 
 if __name__ == "__main__":
     a = [1, 2, 3, 3]
