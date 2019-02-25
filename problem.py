@@ -4,6 +4,24 @@ from contextlib import contextmanager
 from variable import Variable
 
 
+def evaluable(clause, assignment):
+    for variable in clause:
+        if assignment[variable.name] is None:
+            return False
+    return True
+
+
+def istautology(clause):
+    variables = {}
+    for variable in clause:
+        if variable.name in variables:
+            if variable.ispositive != variables[variable.name]:
+                return True
+        else:
+            variables[variable.name] = variable.ispositive
+    return False
+
+
 class Problem:
     def __init__(self, problem):
         self.problem = problem
@@ -13,9 +31,8 @@ class Problem:
         for clause in problem:
             flag = False
             for variable in clause:
-                i = assignments[variable.name]
-                j = variable.ispositive
-                if not (i ^ j):
+                assignment = assignments[variable.name]
+                if variable.evaluate(assignment) is True:
                     flag = True
                     break
             if not flag:
@@ -102,19 +119,4 @@ class Problem:
                 yield variable, len(clause)
 
 
-def evaluable(clause, assignment):
-    for variable in clause:
-        if assignment[variable.name] is None:
-            return False
-    return True
 
-
-def istautology(clause):
-    variables = {}
-    for variable in clause:
-        if variable.name in variables:
-            if variable.ispositive != variables[variable.name]:
-                return True
-        else:
-            variables[variable.name] = variable.ispositive
-    return False

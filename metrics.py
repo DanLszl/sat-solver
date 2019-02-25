@@ -22,16 +22,16 @@ class Metrics:
 
     def __repr__(self):
         return (
-            "number_of_backtracks:"
+            "number_of_backtracks: "
             + str(self.number_of_backtracks)
             + "\n"
-            + "number_of_flips:"
+            + "number_of_flips: "
             + str(self.number_of_flips)
             + "\n"
-            + "number_of_var_picks:"
+            + "number_of_var_picks: "
             + str(self.number_of_var_picks)
             + "\n"
-            + "simplifications:"
+            + "simplifications: "
             + str(self.simplifications)
         )
 

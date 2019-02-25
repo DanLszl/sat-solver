@@ -19,6 +19,9 @@ class Variable:
                 self.ispositive = True
                 self.name = variable
 
+    def evaluate(self, assignment):
+        return not assignment ^ self.ispositive
+
     def __repr__(self):
         return "-" + self.name if not self.ispositive else self.name
 
