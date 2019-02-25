@@ -1,3 +1,6 @@
+import sys
+
+
 class Metrics:
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -12,7 +15,8 @@ class Metrics:
     def backtrack(self):
         self.number_of_backtracks += 1
         if self.verbose:
-            print(self.number_of_backtracks)
+            sys.stdout.write("Number of backtracks so far: %d  \r" % (self.number_of_backtracks))
+            sys.stdout.flush()
 
     def flip(self):
         self.number_of_flips += 1

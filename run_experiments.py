@@ -17,8 +17,8 @@ from problem import Problem
 
 
 # puzzle_file = "1000 sudokus"
-puzzle_file = "damnhard.sdk"
-# puzzle_file = "hard_with_25"
+# puzzle_file = "damnhard.sdk"
+puzzle_file = "hard_with_25"
 rules_file = "sudoku-rules"
 
 
@@ -36,14 +36,14 @@ def test_on_puzzle():
 
         problem = Problem(rules + parsed_puzzle)
 
-        heuristics = [None, "MOM", "literalcount", "Jeroslow"]
-        biased = [True, False]
-        # heuristics = ["Jeroslow"]
-        # biased = [True]
+        # heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+        # biased = [True, False]
+        heuristics = ["Jeroslow"]
+        biased = [True]
         
         # heuristics = ["MOM"]
         # biased = [True]
-        random.seed(285834)
+        random.seed(6486)
         for h in heuristics:
             for b in biased:
                 start_time = time()
@@ -52,6 +52,7 @@ def test_on_puzzle():
                 metrics = Metrics(verbose=not verbose)
                 assignments_to_modify = deepcopy(assignments) 
                 satisfiable, solution = solve_sub_problem(problem, assignments_to_modify, metrics, heuristic=h, biased_coin=b, verbose=verbose)
+                print()
                 print(metrics)
                 print("Time:", time() - start_time)
                 print()
