@@ -13,7 +13,7 @@ def initialise_assignments_from_rules(rules):
     return assignments
 
 
-def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_coin=False, verbose=False):
+def solve_sub_problem(problem, assignments, metrics, heuristic, biased_coin=False, verbose=False):
     problem = deepcopy(problem)
     # assignments = deepcopy(assignments)
     with assignments.checkpoint():
@@ -38,7 +38,7 @@ def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_
                 assignments[variable_name] = first_assignment
                 metrics.pick_var()
 
-                result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin, verbose=verbose)
+                result = solve_sub_problem(problem, assignments, metrics, heuristic, biased_coin, verbose=verbose)
 
                 if result[0]:
                     return result
@@ -48,7 +48,7 @@ def solve_sub_problem(problem, assignments, metrics, heuristic, depth=0, biased_
                 assignments[variable_name] = opposite
                 metrics.flip()
 
-                result = solve_sub_problem(problem, assignments, metrics, heuristic, depth + 1, biased_coin, verbose=verbose)
+                result = solve_sub_problem(problem, assignments, metrics, heuristic, biased_coin, verbose=verbose)
 
                 if result[0]:
                     return result
