@@ -48,7 +48,7 @@ class MOMCounter(Counter):
 
 class Assignments:
     def __init__(self, **kwargs):
-        self.assignments = defaultdict(bool)
+        self.assignments = defaultdict(lambda: None)
         self.modification_stack = [[]]
         self.verbose = False
         self.solved = False
@@ -83,6 +83,9 @@ class Assignments:
 
     def set_solved(self):
         self.solved = True
+
+    def is_solved(self):
+        return self.solved
 
     def __contains__(self, key):
         return key in self.assignments
