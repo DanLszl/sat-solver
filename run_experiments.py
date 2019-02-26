@@ -76,7 +76,8 @@ def run_experiment():
 
                 if satisfiable:
                     # print_sudoku(solution.get_true_vars())
-                    write_metrics_to_file(puzzle_file, puzzle_id, metrics, solution, h, b)
+                    # write_metrics_to_file(puzzle_file, puzzle_id, metrics, solution, h, b)
+                    return rules, assignments_to_modify.get_true_vars()
                 else:
                     print("The problem is not satisfiable")
         break
