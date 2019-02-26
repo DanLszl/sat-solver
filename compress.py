@@ -3,7 +3,8 @@ import itertools
 
 def print_sudoku(m):
     for k in m:
-        print((' '.join(str(i) for i in k)))
+        print((" ".join(str(i) for i in k)))
+
 
 def potential_squares(u1, u2, u3, l1, l2, l3):
     """
@@ -18,8 +19,28 @@ def potential_squares(u1, u2, u3, l1, l2, l3):
     if no items exist the empty list must be given
     """
     for a, b, c, d, e, f, g, h, i in itertools.permutations(list(range(1, 10))):
-        if a not in u1 and a not in l1 and b not in u2 and b not in l1 and c not in u3 and c not in l1 and d not in u1 and d not in l2 and e not in u2 and e not in l2 and f not in u3 and f not in l2 and g not in u1 and g not in l3 and h not in u2 and h not in l3 and i not in u3 and i not in l3:
+        if (
+            a not in u1
+            and a not in l1
+            and b not in u2
+            and b not in l1
+            and c not in u3
+            and c not in l1
+            and d not in u1
+            and d not in l2
+            and e not in u2
+            and e not in l2
+            and f not in u3
+            and f not in l2
+            and g not in u1
+            and g not in l3
+            and h not in u2
+            and h not in l3
+            and i not in u3
+            and i not in l3
+        ):
             yield (a, b, c, d, e, f, g, h, i)
+
 
 def board_to_squares(board):
     """
@@ -39,20 +60,27 @@ def board_to_squares(board):
     d e f   -->  (a,b,c,d,e,f,g,h,i)
     g h i
     """
-    labels = [[3 * i + 1] * 3 + [3 * i + 2] * 3 + [3 * i + 3] * 3 for i in [0, 0, 0, 1, 1, 1, 2, 2, 2]]
+    labels = [
+        [3 * i + 1] * 3 + [3 * i + 2] * 3 + [3 * i + 3] * 3
+        for i in [0, 0, 0, 1, 1, 1, 2, 2, 2]
+    ]
     labelled_board = list(zip(sum(board, []), sum(labels, [])))
     return [tuple(a for a, b in labelled_board if b == sq) for sq in range(1, 10)]
+
 
 def squares_to_board(squares):
     """
     inverse of above
     """
-    board = [[i / 3 * 27 + i % 3 * 3 + j / 3 * 9 + j % 3 for j in range(9)] for i in range(9)]
+    board = [
+        [i / 3 * 27 + i % 3 * 3 + j / 3 * 9 + j % 3 for j in range(9)] for i in range(9)
+    ]
     flattened = sum([list(square) for square in squares], [])
     for i in range(9):
         for j in range(9):
             board[i][j] = flattened[board[i][j]]
     return board
+
 
 def sum_rows(*squares):
     """
@@ -71,6 +99,7 @@ def sum_rows(*squares):
             l3 += [g, h, i]
         return l1, l2, l3
     return [], [], []
+
 
 def sum_cols(*squares):
     """
@@ -100,15 +129,17 @@ def sum_cols(*squares):
         return u1, u2, u3
     return [], [], []
 
+
 def base95(A):
     if type(A) is int or type(A) is int:
-        s = ''
+        s = ""
         while A > 0:
             s += chr(32 + A % 95)
             A /= 95
         return s
     if type(A) is str:
         return sum((ord(c) - 32) * (95 ** i) for i, c in enumerate(A))
+
 
 """
 dependencies: every square as labeled
@@ -120,8 +151,17 @@ is dependent on those above and to the left
 in a dictionary, it is:
 square: ([above],[left])
 """
-dependencies = {1: ([], []), 2: ([], [1]), 3: ([], [1, 2]), 4: ([1], []), 5: ([2], [4]), 6: ([3], [4, 5]),
-                7: ([1, 4], []), 8: ([2, 5], [7]), 9: ([3, 6], [7, 8])}
+dependencies = {
+    1: ([], []),
+    2: ([], [1]),
+    3: ([], [1, 2]),
+    4: ([1], []),
+    5: ([2], [4]),
+    6: ([3], [4, 5]),
+    7: ([1, 4], []),
+    8: ([2, 5], [7]),
+    9: ([3, 6], [7, 8]),
+}
 
 
 """
@@ -156,6 +196,7 @@ def factorize_sudoku(board):
                 continue
     return factors
 
+
 def unfactorize_sudoku(factors):
     squares = []
     for label in range(1, 10):
@@ -169,10 +210,11 @@ def unfactorize_sudoku(factors):
                 continue
     return squares
 
+
 def test_on_inputs(inputs):
     strings = []
     for sudoku in inputs:
-        board = [[int(x) for x in line.split()] for line in sudoku.strip().split('\n')]
+        board = [[int(x) for x in line.split()] for line in sudoku.strip().split("\n")]
         print_sudoku(board)
         factors = factorize_sudoku(board)
 
@@ -180,18 +222,18 @@ def test_on_inputs(inputs):
         for item, modulus in zip(factors, possibilities):
             i *= modulus
             i += item
-        
-        print('integral representation:', i)
-        print('bits of entropy:', i.bit_length())
-        print('')  
+
+        print("integral representation:", i)
+        print("bits of entropy:", i.bit_length())
+        print("")
 
 
 def get_compression_metrics(sudoku):
-    ''''
+    """'
     input is a sudoku in represent_sudoku form
-    '''
-    #TODO: add compression ratio
-    board = [[int(x) for x in line.split()] for line in sudoku.strip().split('\n')]
+    """
+    # TODO: add compression ratio
+    board = [[int(x) for x in line.split()] for line in sudoku.strip().split("\n")]
     factors = factorize_sudoku(board)
     i = 0
     for item, modulus in zip(factors, possibilities):
@@ -200,6 +242,7 @@ def get_compression_metrics(sudoku):
 
     entropy = i.bit_length()
     return entropy
+
 
 if __name__ == "__main__":
     # inputs = """
