@@ -3,7 +3,7 @@ from problem import Problem
 from variable import Variable
 from variable import Assignments
 from metrics import Metrics
-from run_experiments import run_experiment
+# from run_experiments import run_experiment
 from print_sudoku import print_sudoku
 import random
 from davis_putnam import solve_sub_problem
@@ -30,6 +30,7 @@ def pick_randomly_until_solvable(rules, true_variables, assignments, picked_vari
 
 def find_min_compression(rules, true_var_names):
     metrics = Metrics()
+    # print_sudoku(true_var_names)
     # assignments = Assignments(**{var_name: None for var_name in true_var_names})   # No assignments in the beginning
     assignments = Assignments()
     picked_variables = []
@@ -45,8 +46,6 @@ if __name__ == "__main__":
     import time
     random.seed(time.time())
     rules, true_var_names = run_experiment()
-
-    
 
     compressed_length, picked_variables = find_min_compression(rules, true_var_names)
 

@@ -7,6 +7,8 @@ from read_puzzle import (
 )
 from output_sudoku import represent_sudoku
 from compress import get_compression_metrics
+from inverse_problem import find_min_compression
+from problem import Problem
 
 from copy import deepcopy
 
@@ -14,72 +16,66 @@ from metrics import Metrics
 from print_sudoku import print_sudoku
 from time import time
 import random
+import pickle
+from pprint import pprint
 
-from problem import Problem
 
-random.seed(6486)
+verbose = False
 
-puzzle_file = "1000 sudokus"
-# puzzle_file = "damnhard.sdk"
-# puzzle_file = "hardest"
 rules_file = "sudoku-rules"
+puzzle_files = ["100_easy_sudokus", "damnhard.sdk"]
+# puzzle_files = ["2_easy_sudokus"]
 
-def write_metrics_to_file(puzzle_file, puzzle_id, metrics, solution, heuristic, biased):
-    outF = open("solved_sudokus/" + str(puzzle_id) + "_" +
-                puzzle_file + "_" + str(heuristic) + "_" + str(biased) + "_solved.txt", "w")
-    outF.write("puzzle_id:" + str(puzzle_id) + "\n")
-    outF.write("puzzle_file:" + str(puzzle_file) + "\n")
-    outF.write("heuristic:" + str(heuristic) + "\n")
-    outF.write("biased:" + str(biased) + "\n")
-    outF.write("number_of_backtracks:" + str(metrics.number_of_backtracks) + "\n")
-    outF.write("number_of_flips:" + str(metrics.number_of_flips) + "\n")
-    outF.write("number_of_var_picks:" + str(metrics.number_of_var_picks) + "\n")
-    outF.write("simplifications:" + str(metrics.simplifications) + "\n")
-    output_sudoku = represent_sudoku(solution.get_true_vars())
-    entropy = get_compression_metrics(output_sudoku)
-    outF.write("entropy:"+str(entropy) + "\n")
-    outF.write(output_sudoku)
+heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+biased = [True, False]
 
 
-def run_experiment():
+def run_experiments(heuristics, biased, min_compressions_attempts = 10):
     rules = parse_dimacs(read_dimacs(rules_file))
     assignments = initialise_assignments_from_rules(rules)
+    output = dict()
 
-    for puzzle_id, puzzle in enumerate(read_puzzles(puzzle_file)):
+    for puzzle_file in puzzle_files:
+        output[puzzle_file] = dict()
 
-        parsed_puzzle = parse_dimacs(encode_puzzle(puzzle))
+        for puzzle_id, puzzle in enumerate(read_puzzles(puzzle_file)):
+            parsed_puzzle = parse_dimacs(encode_puzzle(puzzle))
+            problem = Problem(rules + parsed_puzzle)
+            output[puzzle_file][puzzle_id] = dict()
+            
+            for h in heuristics:
+                for b in biased:
+                    print(puzzle_file, puzzle_id, h, b)
 
-        print(puzzle_id)
-        # print("Puzzle:")
-        # print(parsed_puzzle)
-        # print_sudoku([v[0].name for v in parsed_puzzle])
+                    metrics = Metrics()
+                    output[puzzle_file][puzzle_id][(h, b)] = dict()
 
-        problem = Problem(rules + parsed_puzzle)
-
-        heuristics = [None, "MOM", "literalcount", "Jeroslow"]
-        biased = [True, False]
-        # heuristics = ["Jeroslow"]
-        # biased = [True]
+                    assignments_to_modify = deepcopy(assignments) 
+                    satisfiable, solution = solve_sub_problem(problem, assignments_to_modify, metrics, heuristic=h, biased_coin=b, verbose=verbose)
+                    if satisfiable:
+                        output[puzzle_file][puzzle_id][(h, b)]["number_of_backtracks"] = metrics.number_of_backtracks
+                        output[puzzle_file][puzzle_id][(h, b)]["number_of_flips"] = metrics.number_of_flips
+                        output[puzzle_file][puzzle_id][(h, b)]["number_of_var_picks"] = metrics.number_of_var_picks
+                        output[puzzle_file][puzzle_id][(h, b)]["simplifications"] = metrics.simplifications
         
-        for h in heuristics:
-            for b in biased:
-                start_time = time()
-                # print(h, b)
-                verbose = False
-                metrics = Metrics(verbose = verbose)
-                assignments_to_modify = deepcopy(assignments) 
-                satisfiable, solution = solve_sub_problem(problem, assignments_to_modify, metrics, heuristic=h, biased_coin=b, verbose=verbose)
-                # print()
-                # print(metrics)
-                # print("Time:", time() - start_time)
-                # print()
+                    else:
+                        print("The problem is not satisfiable")
 
-                if satisfiable:
-                    # print_sudoku(solution.get_true_vars())
-                    # write_metrics_to_file(puzzle_file, puzzle_id, metrics, solution, h, b)
-                    return rules, assignments_to_modify.get_true_vars()
-                else:
-                    print("The problem is not satisfiable")
-        break
+            if satisfiable:
+                entropy = get_compression_metrics(represent_sudoku(solution.get_true_vars()))
+                output[puzzle_file][puzzle_id]["entropy"] = entropy
+                output[puzzle_file][puzzle_id]["min_compression"] = []
+
+                for attempt in range(min_compressions_attempts):
+                    compressed_length, _ = find_min_compression(rules, assignments_to_modify.get_true_vars())
+                    output[puzzle_file][puzzle_id]["min_compression"].append(compressed_length)
+                    
+    return output
+            
+        
 if __name__ == "__main__":
-    run_experiment()
+    heuristics = [None, "MOM", "literalcount", "Jeroslow"]
+    biased = [True, False]
+    output = run_experiments(heuristics, biased)
+    pickle.dump(output, open("experiment_results.pickle", "wb"))
+
