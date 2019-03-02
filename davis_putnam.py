@@ -4,13 +4,13 @@ from variable import Assignments
 from simplification import simplify
 
 
-def initialise_assignments_from_rules(rules):
-    assignments = Assignments()
-    for clause in rules:
-        for variable in clause:
-            assignments[variable.name] = None
+# def initialise_assignments_from_rules(rules):
+#     assignments = Assignments()
+#     for clause in rules:
+#         for variable in clause:
+#             assignments[variable.name] = None
 
-    return assignments
+#     return assignments
 
 
 def solve_sub_problem(problem, assignments, metrics, heuristic, biased_coin=False, verbose=False):

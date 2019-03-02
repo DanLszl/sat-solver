@@ -1,7 +1,7 @@
 from collections import defaultdict
 from contextlib import contextmanager
 
-from variable import Variable
+from variable import Variable, Assignments
 
 
 def evaluable(clause, assignment):
@@ -26,6 +26,7 @@ class Problem:
     def __init__(self, problem):
         self.problem = problem
         self.modification_stack = [[]]
+        self.initalized = False
 
     @contextmanager
     def checkpoint(self):
@@ -42,6 +43,18 @@ class Problem:
         for clause in self.modification_stack[-1]:
             self.problem.append(clause)
         del self.modification_stack[-1]
+
+    def initialise_assignments_from_rules(self):
+        rules = self.problem
+        if not self.initalized:
+            self.initalized = True
+            assignments = Assignments()
+            for clause in rules:
+                for variable in clause:
+                    assignments[variable.name] = None
+            return assignments
+        else:
+            raise ValueError('Assignments based on this problem were already initialized. Are you sure you want to do this?')
 
     def satisfied(self, assignments):
         problem = self.problem
