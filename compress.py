@@ -1,3 +1,9 @@
+'''
+
+Source: https://codegolf.stackexchange.com/questions/41523/sudoku-compression
+
+'''
+
 import itertools
 
 
