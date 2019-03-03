@@ -20,15 +20,3 @@ def simplify(problem, assignments, metrics, verbose=False):
         else:
             metrics.simplify(modifications)
             return simplify(problem, assignments, metrics, verbose)
-
-
-if __name__ == "__main__":
-
-    assignments = Assignments(**{"P": False, "Q": None, "R": None})
-    # Solution: P: True, Q: Q: True, R: False
-    problem = [
-        [Variable("P"), Variable("-Q")],
-        [Variable("Q"), Variable("R")],
-        [Variable("-R"), Variable("-P")],
-    ]
-    print(simplify(problem, assignments))

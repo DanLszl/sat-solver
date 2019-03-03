@@ -1,26 +1,30 @@
-from davis_putnam import solve_sub_problem
-from read_puzzle import read_dimacs, parse_dimacs, read_puzzles, encode_puzzle
-from output_sudoku import represent_sudoku
-from compress import get_compression_metrics
-from inverse_problem import find_min_compression
-from problem import Problem
-
+import argparse
 from copy import deepcopy
-
-from metrics import Metrics
-from print_sudoku import print_sudoku
 from time import time
 import random
 import pickle
-from pprint import pprint
 
-import argparse
 from collections import defaultdict
 from multiprocessing.pool import Pool
+from pprint import pprint
 
 import itertools
 from os import cpu_count
 import tqdm
+
+from davis_putnam import solve_sub_problem
+from read_puzzle import read_dimacs, parse_dimacs, read_puzzles, encode_puzzle
+from output_sudoku import represent_sudoku
+
+from compress import get_compression_metrics
+from inverse_problem import find_min_compression
+from problem import Problem
+
+from metrics import Metrics
+
+
+from print_sudoku import print_sudoku
+
 
 verbose = False
 
@@ -36,14 +40,9 @@ def tree():
     return defaultdict(tree)
 
 
-class Progress:
-    def __init__(self, ):
-        pass
-
-
 def solve_problem(rules_puzzle, how_many_times=3, min_compressions_attempts=10):
     rules, puzzle = rules_puzzle
-    heuristics = [None]#, "MOM"]#, "literalcount", "Jeroslow"]
+    heuristics = [None, "MOM", "literalcount", "Jeroslow"]
     biased = [True, False]
 
     problem = Problem(puzzle+rules)
@@ -53,7 +52,6 @@ def solve_problem(rules_puzzle, how_many_times=3, min_compressions_attempts=10):
     results = tree()
 
     for h, b in itertools.product(heuristics, biased):
-
         for i in range(how_many_times):
             arguments = dict(
                 problem=deepcopy(problem),
@@ -67,7 +65,6 @@ def solve_problem(rules_puzzle, how_many_times=3, min_compressions_attempts=10):
             result = results[(h, b)] 
             if 'metrics' in result:
                 result["metrics"].append(arguments["metrics"])
-                
             else:
                 result["metrics"] = [arguments["metrics"]]
             
@@ -113,24 +110,12 @@ def run_experiments_parallel(puzzles_file, solution_tries, min_compression_attem
 
     with Pool(cpus) as p:
         results = {}
-
-        # for problem in tqdm.tqdm(problems):
-        #     result = solve_problem(problem)
-        #     results.append(result)
-
-
-        for i, result in tqdm.tqdm(p.imap(solve_problem, problems), total=len(problems)):
+        for i, result in enumerate(tqdm.tqdm(p.imap(solve_problem, problems), total=len(problems))):
             results[i] = result
 
     print(results)
 
-    
-
-
-
     return results
-
-    # return output
 
 
 def run_experiments(heuristics, biased, min_compressions_attempts=10):
@@ -215,10 +200,6 @@ if __name__ == "__main__":
         help="Input file containing sudoku puzzles",
     )
 
-    # parser.add_argument('-o', '--output_file', type=str,
-    #                     required=True,
-    #                     help='Output file containing results run on the sudokus')
-
     args = parser.parse_args()
     print(args)
 
@@ -230,4 +211,3 @@ if __name__ == "__main__":
 
     with open(output_file, "wb") as f:
         pickle.dump(output, f)
-
