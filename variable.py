@@ -37,13 +37,6 @@ class MOMCounter(Counter):
             return MOMCounter(
                 {k: self[k] * other[k] for k in self.keys() | other.keys()}
             )
-    
-    def get_most_common(self):
-        most_common = super().most_common()
-        for idx, ((i_name, i_value), (j_name, j_value)) in enumerate(zip(most_common[:-1], most_common[1:])):
-            if i_value != j_value:
-                return random.choice(most_common[:idx+1])[0]
-        return random.choice(most_common)
 
 
 class Assignments:
@@ -193,8 +186,8 @@ class Assignments:
 
     def pick_variable_literal_count(self, problem, pos_counter, neg_counter):
         sum_counter = pos_counter + neg_counter
-        variable_name = sum_counter.get_most_common()[0]
-        return variable_name
+        most_commons = all_max(sum_counter, sum_counter.get)
+        return random.choice(most_commons)
 
     def count_pos_neg(self, problem):
         pos_counter = MOMCounter(
@@ -213,8 +206,8 @@ class Assignments:
         pos_counter, neg_counter = self.count_pos_neg(problem)
 
         S = (pos_counter + neg_counter) * 2 ** k + pos_counter * neg_counter
-
-        return S.get_most_common()[0]
+        maxes = all_max(S, key=S.get)
+        return random.choice(maxes)
 
     def pick_variable_Jeroslow(self, problem):
         jeroslow_values = defaultdict(float)
