@@ -132,6 +132,11 @@ class Assignments:
     def get_assigned(self):
         return self.get_true_vars() + self.get_false_vars()
 
+    def get_solution(self):
+        true_vars = [Variable(var_name, True) for var_name in self.get_true_vars()]
+        false_vars = [Variable(var_name, False) for var_name in self.get_false_vars()]
+        return true_vars + false_vars
+
     def get_unassigned(self):
         unassigned = []
         for k, v in self.assignments.items():

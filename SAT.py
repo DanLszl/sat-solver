@@ -51,10 +51,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print(args)
-    print(args.input_file)
-    print(args.method)
-
     in_file = args.input_file
     out_file = in_file + ".out"
 
@@ -63,17 +59,18 @@ if __name__ == "__main__":
     chosen_heuristic = heuristics[args.method % 4]
     chosen_bias = bool(args.method // 4)
 
-    print(chosen_heuristic)
-    print(chosen_bias)
+    print('Heuristic:', chosen_heuristic)
+    print('Using biased coin:', chosen_bias)
 
     dimacs = read_dimacs(in_file)
     parsed = parse_dimacs(dimacs)
     satisfiable, assignments = solve_problem(
-        parsed, chosen_heuristic, chosen_bias, verbose=True
+        parsed, chosen_heuristic, chosen_bias, verbose=False
     )
 
     if satisfiable:
         print("The problem is satisfiable")
+        print('The solution was written to ', out_file)
         write_output(assignments, out_file)
     else:
         print("The problem is not satisfiable")
