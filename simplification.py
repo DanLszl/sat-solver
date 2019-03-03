@@ -1,5 +1,3 @@
-from variable import Variable, Assignments
-
 
 def simplify(problem, assignments, metrics, verbose=False):
     """

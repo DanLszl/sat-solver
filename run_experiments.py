@@ -28,7 +28,7 @@ from print_sudoku import print_sudoku
 
 verbose = False
 
-rules_file = "sudoku-rules"
+rules_file = "sudoku-rules.txt"
 puzzle_files = ["100_easy_sudokus", "damnhard.sdk"]
 # puzzle_files = ["2_easy_sudokus"]
 
