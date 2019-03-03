@@ -3,7 +3,7 @@
 ## Requirements
 Python 3.6
 
-### To run the experiments and analyzing notebooks, also run
+### To run the experiments and analyzing notebooks, also run (this is not needed for the SAT solver)
 
 ```pip install -r requirements.txt```
 
