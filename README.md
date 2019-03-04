@@ -8,9 +8,10 @@ Python 3.6
 ```pip install -r requirements.txt```
 
 ## Usage
+Run the python script found in the ```SAT``` file. 
 Navigate to the folder of the repository and run:
 
-```./SAT.py -Sn input_file```
+```./SAT -Sn input_file```
 
 Where n is a number between 0 and 7 specifying the heuristic to run. 
     
