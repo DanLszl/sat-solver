@@ -1,8 +1,25 @@
+☐ remove extension
+☐ fix variable picking bug
+☐ try all methods
+☐ remove TODO from submission
+
+
+
+☐ Submission  
+  ☐ Requirements
+  ☐ Packaging
+    ☐ Linux
+  ✔ Delete unnecessary commented out code @done(19-03-03 03:26)
+  ✔ Rewrite sudoku printing @done(19-03-03 03:26)
+  ☐ (?) Refactor a bunch of stuff
+
 ☐ hypotheses/Experiments
   
   ☐ Is compression size (?) correlated to the hardness of a sudoku
-    ☐ How compression works: removes trivial things
-    ☐ Pick Compression algorithm for sudoku
+    ✔ How compression works: removes trivial things @done(19-03-01 18:47)
+    ✔ Pick Compression algorithm for sudoku @done(19-03-01 18:47)
+      ✔ Possible blocks @done(19-03-01 18:47)
+      ✔ Stochastic DP simplification @done(19-03-01 18:47)
   ☐ Set up
     ☐ Flow
       ☐ Do this for a lot of sudokus
